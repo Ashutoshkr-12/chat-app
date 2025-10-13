@@ -1,0 +1,23 @@
+
+import Sidebar from '@/components/sidebar';
+
+
+interface AppLayoutProps {
+  children: React.ReactNode;
+
+}
+
+const AppLayout = ({ children}: AppLayoutProps) => {
+  return (
+    <>
+    <div className="flex flex-col min-h-screen md:flex-row">
+      <Sidebar/>
+      <main className="flex-1 pb-20 md:pb-0 md:pl-16">
+        {children}
+      </main>
+    </div>
+    </>
+  )
+};
+
+export default AppLayout;
