@@ -1,5 +1,5 @@
 import AppLayout from "@/components/AppLayout";
-import ChatApp from "@/components/chatInterface";
+import ChatLayout from "@/components/chatInterface";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks"
 import { logout, setOnlineUser, setSocketConnection, setUser } from "@/redux/userSlice";
 import { useEffect } from "react";
@@ -62,7 +62,7 @@ const Homepage = () => {
 
   return (
     <AppLayout>
-      <ChatApp/>
+      <ChatLayout/>
     </AppLayout>
   )
 }

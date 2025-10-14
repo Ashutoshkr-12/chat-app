@@ -1,5 +1,5 @@
 import App from "@/App";
-import Messagepage from "@/components/Messagepage";
+import MessagePage from "@/components/Messagepage";
 import Homepage from "@/pages/Homepage";
 import Loginpage from "@/pages/Loginpage";
 import Registerpage from "@/pages/Registerpage";
@@ -25,8 +25,8 @@ export const router = createBrowserRouter([
                 Component:  Homepage,
                 children: [
                     {
-                        path: ':userId',
-                        Component: Messagepage
+                        path: '/chat/:id',
+                        Component: MessagePage
                     }
                 ]
             }
