@@ -16,7 +16,15 @@ const userSchema = new Schema({
     },
     profileImage: {
         type:String,
-
+        default: ''
+    },
+    socketId: {
+        type: String,
+        default: ''
+    },
+    online: {
+        type: Boolean,
+        default: false,
     }
 
 }, { timestamps: true})

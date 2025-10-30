@@ -57,6 +57,7 @@ const registerUser = async(req,res) =>{
             error: true
          })
      }
+
  
      const hashedPassword = await bcrypt.hash(password,10)
  

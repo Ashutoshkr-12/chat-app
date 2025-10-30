@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import assets from "@/assets/assets";
+import { apiFetch } from "@/lib/api";
 
 export function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -43,33 +45,23 @@ export function RegisterForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      const formDataToSend = new FormData();
+      const formDataToSend: FormData = new FormData();
       formDataToSend.append("name", formData.name);
       formDataToSend.append("email", formData.email);
       formDataToSend.append("password", formData.password);
       if (file) formDataToSend.append("file", file);
-      
 
-      const res = await fetch(
-        `${import.meta.env.VITE_APPLICATION_BACKEND_URL}/api/register`,
-        {
-          method: "POST",
-          body: formDataToSend,
-          credentials: "include",
-        }
-      );
+      // pass method as string and FormData as the body (apiFetch handles FormData)
+      const data = await apiFetch('/auth/register', 'POST', formDataToSend);
 
-      const data = await res.json();
-
-      if (res.ok) {
-       toast.success("success: Confirm your account by logging in")
-        navigate('/login')
-      } else {
-        toast.error(data.message);
-        setLoading(false);
-      }
-    } catch (error) {
+      if(data.success){
+        toast.success('Account created successfully')
+         navigate("/login")
+        };
+        
+    } catch (error: any) {
       console.error("Error in user creation from frontend:", error);
+      toast.error(error?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -78,8 +70,11 @@ export function RegisterForm() {
   return (
     <Card>
       <CardHeader>
+          <div className="w-full h-20 flex items-center justify-center border-b py-2 ">
+            <img className="px-4 " src={assets.chatlogo} alt="" />
+          </div>
         <CardTitle className="w-full flex items-center justify-center text-xl font-bold">
-          Create an account
+          Create an WeChat account
         </CardTitle>
         <CardDescription>
           Enter your information below to create your account

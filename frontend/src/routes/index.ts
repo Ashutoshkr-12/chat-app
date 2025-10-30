@@ -1,8 +1,11 @@
 import App from "@/App";
-import MessagePage from "@/components/Messagepage";
+import MessagePage from "@/components/messages/Messagepage";
+import Callingpage from "@/pages/Callingpage";
 import Homepage from "@/pages/Homepage";
 import Loginpage from "@/pages/Loginpage";
+import Profilepage from "@/pages/Profilepage";
 import Registerpage from "@/pages/Registerpage";
+import Requestpage from "@/pages/Requestpage";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -29,6 +32,19 @@ export const router = createBrowserRouter([
                         Component: MessagePage
                     }
                 ]
+            },
+            {
+                path: '/requests',
+                Component:  Requestpage,
+               
+            },
+            {
+                path: '/profile',
+                Component: Profilepage
+            },
+            {
+                path: '/calls',
+                Component: Callingpage
             }
         ]
     }

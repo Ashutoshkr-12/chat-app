@@ -1,9 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
-import userReducer from '@/redux/userSlice'
+import authReducer from '@/redux/authSlice'
+import requestReducer from '@/redux/authSlice'
+import conversationReducer from '@/redux/authSlice'
+import messageReducer from '@/redux/authSlice'
 
 export const store = configureStore({
   reducer: {
-    user: userReducer
+    auth: authReducer,
+    requests: requestReducer,
+    conversations: conversationReducer,
+    messages: messageReducer, 
   },
 })
 

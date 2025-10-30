@@ -1,11 +1,11 @@
-import { useParams, useNavigate, useOutletContext } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
-import { useState, useEffect } from "react";
 
 type Message = {
   id: number;
@@ -17,26 +17,18 @@ type Message = {
 type Chat = {
   id: number;
   name: string;
-  avatar?: string;
+  avatar: string;
   messages: Message[];
 };
 
-interface OutletContext {
-  chats: Chat[];
+interface MessagePageProps {
+  chat: Chat;
 }
 
-export default function MessagePage() {
+export default function MessagePage({ chat }: MessagePageProps) {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const { chats } = useOutletContext<OutletContext>();
-
-  const selectedChat = chats.find((c) => c.id === Number(id));
   const [message, setMessage] = useState("");
-  const [chatMessages, setChatMessages] = useState<Message[]>([]);
-
-  useEffect(() => {
-    if (selectedChat) setChatMessages(selectedChat.messages);
-  }, [selectedChat]);
+  const [chatMessages, setChatMessages] = useState<Message[]>(chat.messages);
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
@@ -50,17 +42,10 @@ export default function MessagePage() {
     setMessage("");
   };
 
-  if (!selectedChat)
-    return (
-      <div className="flex flex-1 items-center justify-center text-gray-500">
-        Select a chat to start messaging
-      </div>
-    );
-
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
+    <div className="flex flex-col flex-1 bg-white dark:bg-gray-900 overflow-y-scroll">
       {/* Header */}
-      <div className="p-4 border-b flex items-center gap-3 sticky top-0 bg-white dark:bg-gray-900 z-10">
+      <div className="p-4 border-b flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
@@ -70,11 +55,11 @@ export default function MessagePage() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <Avatar>
-          <AvatarImage src={selectedChat.avatar} />
-          <AvatarFallback>{selectedChat.name[0]}</AvatarFallback>
+          <AvatarImage src={chat.avatar} />
+          <AvatarFallback>{chat.name[0]}</AvatarFallback>
         </Avatar>
         <div>
-          <p className="font-medium">{selectedChat.name}</p>
+          <p className="font-medium">{chat.name}</p>
           <p className="text-sm text-gray-500">Online</p>
         </div>
       </div>
@@ -92,7 +77,7 @@ export default function MessagePage() {
             )}
           >
             <p>{msg.text}</p>
-            <span className="block text-[10px] text-right text-gray-300 mt-1">
+            <span className="block text-[10px] text-right text-gray-300">
               {msg.time}
             </span>
           </div>
@@ -100,18 +85,14 @@ export default function MessagePage() {
       </ScrollArea>
 
       {/* Input */}
-      <div className="p-3 border-t flex items-center gap-2 sticky bottom-0 bg-white dark:bg-gray-900">
+      <div className="p-3 border-t flex items-center gap-2">
         <Input
           placeholder="Type a message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          className="flex-1"
         />
-        <Button
-          onClick={handleSendMessage}
-          className="bg-green-500 text-white hover:bg-green-600"
-        >
+        <Button onClick={handleSendMessage} className="bg-green-500 text-white">
           Send
         </Button>
       </div>

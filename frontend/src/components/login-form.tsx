@@ -1,3 +1,4 @@
+import assets from "@/assets/assets"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,52 +15,39 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useAppDispatch } from "@/hooks/hooks"
-import { setToken } from "@/redux/userSlice"
+import { apiFetch } from "@/lib/api"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import { NavLink, useNavigate } from "react-router-dom"
+import {fetchUser} from '@/redux/authSlice'
 
+type Form ={
+  email: string;
+  password: string;
+}
 export function LoginForm() {
 
-  const [email, setEmail] = useState('');;
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState<Form>({ email: "", password: ""});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
+    
+
     try {
-      const res = await fetch(`${import.meta.env.VITE_APPLICATION_BACKEND_URL}/api/login`,{
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email,
-          password
-        }),
-        credentials: 'include'
-      })
+      const data = await apiFetch('/auth/login',"POST", form)      
 
-      const data = await res.json();
-
-      
       if(data){
-       // console.log(data)
-        dispatch(setToken(data.token))
-        localStorage.setItem('token',data.token)
+        toast.success("Login successful")
+        navigate("/")
+        dispatch(fetchUser());
       }
       
-      if(res.ok){
-        navigate('/')
-      }else{
-        toast.error(data.message)
-      }
     } catch (error) {
-      console.error('unable to login user:', error)
-    } finally{
       setLoading(false)
     }
   }
@@ -68,20 +56,23 @@ export function LoginForm() {
     <div className="flex flex-col gap-6" >
       <Card>
         <CardHeader>
+          <div className="w-full h-20 flex items-center justify-center border-b py-2 ">
+            <img className="px-4 " src={assets.chatlogo} alt="" />
+          </div>
          <CardTitle className="w-full flex items-center justify-center text-xl font-bold">Login to your account</CardTitle>
           <CardDescription>
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleLogin}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
                   type="email"
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setForm({...form, email: e.target.value})}
                   placeholder="example@gmail.com"
                   required
                 />
@@ -96,7 +87,7 @@ export function LoginForm() {
                     Forgot your password?
                   </NavLink>
                 </div>
-                <Input id="password" onChange={(e)=> setPassword(e.target.value)}  type="password" required />
+                <Input id="password" onChange={(e)=> setForm({...form, password: e.target.value})}  type="password" required />
               </Field>
               <Field>
                 {loading ? (

@@ -4,7 +4,10 @@ dotenv.config();
 import cors from 'cors'
 import connectDB from './config/db.js';
 import cookieParser from 'cookie-parser';
-import userRouter from './routes/user.router.js';
+import userRoutes from './routes/user.router.js';
+import messageRoutes from './routes/message.router.js';
+import requestRoutes from './routes/request.router.js';
+import conversationRoutes from './routes/conversation.router.js';
 import { app,server } from './socket/socket.js';
 
 
@@ -29,7 +32,11 @@ connectDB().then(()=>{
 
 
 // API ROUTES.......
-app.use('/api',userRouter)
+app.use('/api/auth',userRoutes)
+app.use('/api/request',requestRoutes)
+app.use('/api/conversations',conversationRoutes)
+app.use('/api/messages',messageRoutes)
 
+ 
 
 export {app};
