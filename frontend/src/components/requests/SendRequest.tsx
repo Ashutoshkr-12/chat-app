@@ -1,5 +1,5 @@
 import { useAppDispatch } from "@/hooks/hooks";
-import { acceptRequest, sendRequest } from "@/redux/requestSlice";
+import {  sendRequest } from "@/redux/requestSlice";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 

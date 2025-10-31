@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
-import { useParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 
+interface MessagePageProps {
+  selectedChat: any;
+  onBack: () => void;
+}
 
-export default function MessagePage() {
-  const { conversationId } = useParams();
-  const dispatch = useAppDispatch();
-  const messages = useAppSelector((state) => state.messages[conversationId ?? ""])
-
+export default function MessagePage({ selectedChat, onBack }: MessagePageProps) {
+  const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const { user } = useSelector((state: RootState) => state.auth);
   const socketRef = useRef<any>(null);
