@@ -113,7 +113,7 @@ const loginUser = async(req,res) =>{
      }
 
     
-  const isValid = await bcrypt.compare(password,user.password)
+     const isValid = await bcrypt.compare(password,user.password)
  
      if(!isValid){
          return res.status(400).json({
@@ -126,7 +126,7 @@ const loginUser = async(req,res) =>{
      delete userObj.password;
 
      const token = jwt.sign(
-        { id: user.id, email: user.email},
+        { id: user._id, email: user.email},
         process.env.JWT_SECRET,{expiresIn: "7d"}
      )
  

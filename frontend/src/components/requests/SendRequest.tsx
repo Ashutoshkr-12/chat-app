@@ -1,5 +1,5 @@
 import { useAppDispatch } from "@/hooks/hooks";
-import { sendRequest } from "@/redux/requestSlice";
+import { acceptRequest, sendRequest } from "@/redux/requestSlice";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -42,7 +42,7 @@ const SendRequest = () => {
 
   const handleSend = (receiverId: string) => {
     try {
-      console.log('receiverId:',receiverId);
+      //console.log('receiverId:',receiverId);
       dispatch(sendRequest(receiverId));
      
     } catch (error) {

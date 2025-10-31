@@ -10,9 +10,9 @@ interface Request {
 const ReceivedRequests = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
-   const requests = useAppSelector((state) => state.requests.list);
+   const {incoming} = useAppSelector((state) => state.requests);
 
-   console.log(requests);
+   console.log(incoming);
 
    useEffect(() => {
     dispatch(fetchRequests())
@@ -21,7 +21,7 @@ const ReceivedRequests = () => {
   const handleAccept = (requestId: string) => {
     setLoading(true);
     try {
-      dispatch(acceptRequest(requestId))
+      dispatch(acceptRequest(requestId as any))
     } catch (err) {
       console.error(err);
     }finally{
@@ -37,13 +37,13 @@ const ReceivedRequests = () => {
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
-      ) : Array.isArray(requests) && requests.length > 0 ? (
-          requests.map((req) => (
+      ) : Array.isArray(incoming) && incoming.length > 0 ? (
+          incoming.map((req) => (
           <div
             key={req.id}
             className="flex justify-between items-center border-b py-2"
           >
-            <span>{req.from}</span>
+            <span>{req.from?.name}</span>
             <button
               onClick={() => handleAccept(req._id)}
               className="bg-green-500 text-white px-3 py-1 rounded-md"

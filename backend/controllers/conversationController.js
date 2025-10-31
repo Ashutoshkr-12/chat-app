@@ -2,7 +2,7 @@ import Conversation from "../models/conversation.model.js";
 
 export const getConversation = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user.id;
     const conversations = await Conversation.find({ members: userId })
       .populate("members", "name email profileImage online")
       .sort({ updatedAt: -1 });
@@ -10,8 +10,8 @@ export const getConversation = async (req, res) => {
     return res
       .status(200)
       .json(
-        { message: "Conversation fetched", data: conversations },
-        { success: true }
+        { message: "Conversation fetched", data: conversations,success: true },
+    
       );
   } catch (error) {
     console.error("Error in finding conversation from server:", error);

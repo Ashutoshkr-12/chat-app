@@ -15,11 +15,11 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useAppDispatch } from "@/hooks/hooks"
-import { apiFetch } from "@/lib/api"
+
 import { useState } from "react"
 import toast from "react-hot-toast"
 import { NavLink, useNavigate } from "react-router-dom"
-import {fetchUser} from '@/redux/authSlice'
+import { loginUser} from '@/redux/authSlice'
 
 type Form ={
   email: string;
@@ -36,17 +36,12 @@ export function LoginForm() {
     e.preventDefault();
     setLoading(true);
 
-    
-
     try {
-      const data = await apiFetch('/auth/login',"POST", form)      
-
-      if(data){
-        toast.success("Login successful")
+     const result = await dispatch(loginUser(form));
+     if(result.meta.requestStatus === 'fulfilled'){
+      toast.success("Login successful")
         navigate("/")
-        dispatch(fetchUser());
-      }
-      
+     }      
     } catch (error) {
       setLoading(false)
     }

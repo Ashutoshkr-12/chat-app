@@ -1,100 +1,104 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ArrowLeft } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
+import { useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 
-type Message = {
-  id: number;
-  sender: "me" | "other";
-  text: string;
-  time: string;
-};
 
-type Chat = {
-  id: number;
-  name: string;
-  avatar: string;
-  messages: Message[];
-};
+export default function MessagePage() {
+  const { conversationId } = useParams();
+  const dispatch = useAppDispatch();
+  const messages = useAppSelector((state) => state.messages[conversationId ?? ""])
 
-interface MessagePageProps {
-  chat: Chat;
-}
+  const [input, setInput] = useState("");
+  const { user } = useSelector((state: RootState) => state.auth);
+  const socketRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-export default function MessagePage({ chat }: MessagePageProps) {
-  const navigate = useNavigate();
-  const [message, setMessage] = useState("");
-  const [chatMessages, setChatMessages] = useState<Message[]>(chat.messages);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
-    const newMsg: Message = {
-      id: Date.now(),
-      sender: "me",
-      text: message,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  const sendMessage = () => {
+    if (!input.trim()) return;
+
+    const msg = {
+      conversationId: selectedChat._id,
+      sender: user?._id,
+      text: input,
     };
-    setChatMessages((prev) => [...prev, newMsg]);
-    setMessage("");
+
+    socketRef.current.emit("send_message", msg);
+    setMessages((prev) => [...prev, msg]);
+    setInput("");
   };
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
-    <div className="flex flex-col flex-1 bg-white dark:bg-gray-900 overflow-y-scroll">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => navigate("/")}
+      <div className="flex items-center gap-3 p-4 border-b bg-white dark:bg-gray-800">
+        <button
+          onClick={onBack}
+          className="md:hidden text-gray-700 dark:text-gray-300"
         >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <Avatar>
-          <AvatarImage src={chat.avatar} />
-          <AvatarFallback>{chat.name[0]}</AvatarFallback>
-        </Avatar>
+          ←
+        </button>
+        <img
+          src={
+            selectedChat.sender._id === user?._id
+              ? selectedChat.receiver.profilePic
+              : selectedChat.sender.profilePic
+          }
+          alt="profile"
+          className="w-10 h-10 rounded-full"
+        />
         <div>
-          <p className="font-medium">{chat.name}</p>
-          <p className="text-sm text-gray-500">Online</p>
+          <h3 className="text-sm font-medium">
+            {selectedChat.sender._id === user?._id
+              ? selectedChat.receiver.name
+              : selectedChat.sender.name}
+          </h3>
         </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4 space-y-2">
-        {chatMessages.map((msg) => (
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.map((msg, idx) => (
           <div
-            key={msg.id}
-            className={cn(
-              "max-w-[75%] px-4 py-2 rounded-xl",
-              msg.sender === "me"
-                ? "ml-auto bg-green-500 text-white"
-                : "mr-auto bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
-            )}
+            key={idx}
+            className={`flex ${
+              msg.sender === user?._id ? "justify-end" : "justify-start"
+            }`}
           >
-            <p>{msg.text}</p>
-            <span className="block text-[10px] text-right text-gray-300">
-              {msg.time}
-            </span>
+            <div
+              className={`px-3 py-2 rounded-lg max-w-xs ${
+                msg.sender === user?._id
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-900"
+              }`}
+            >
+              {msg.text}
+            </div>
           </div>
         ))}
-      </ScrollArea>
+        <div ref={messagesEndRef} />
+      </div>
 
       {/* Input */}
-      <div className="p-3 border-t flex items-center gap-2">
-        <Input
+      <div className="flex items-center border-t p-3">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Type a message..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+          className="flex-1 outline-none border rounded-lg px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800"
         />
-        <Button onClick={handleSendMessage} className="bg-green-500 text-white">
+        <button
+          onClick={sendMessage}
+          className="ml-2 bg-blue-600 text-white px-4 py-2 rounded-lg"
+        >
           Send
-        </Button>
+        </button>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { apiFetch } from "@/lib/api";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import type { RootState } from "@/redux/store";
+import { getSocket } from "@/socket/socket";
 
 type Message = {
   _id?: string;
@@ -15,23 +15,49 @@ type MessageState = {
   [conversationId: string]: Message[];
 };
 
-// ✅ Async thunks
-export const fetchMessages = createAsyncThunk<Message[], string>(
+const URL = import.meta.env.VITE_APPLICATION_BACKEND_URL
+
+
+export const fetchMessages = createAsyncThunk(
   "messages/fetch",
   async (conversationId: string) => {
-    const data = await apiFetch(`/messages/${conversationId}`);
-    return data;
+    const res = await fetch(`/messages/${conversationId}`, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await res.json();
+    return { conversationId, messages: data.data };
   }
 );
 
 export const sendMessage = createAsyncThunk<
   Message,
-  { conversationId: string; text: string }
->("messages/send", async ({ conversationId, text }) => {
-  const data = await apiFetch(`/messages/${conversationId}`, "POST", { text });
-  return data;
-});
+  { conversationId: string; text: string; receiverId: string },
+  { state: RootState }
+>("messages/send", async ({ conversationId, receiverId, text }, { getState }) => {
+  const state = getState();
+  const token = state.auth?.token;
+  const user = state.auth?.user;
 
+  const res = await fetch(`${URL}/messages/${conversationId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`},
+    body: JSON.stringify({text}),
+    credentials: 'include'
+  });
+
+  const data = await res.json();
+
+  if(data.success){
+    const socket = getSocket();
+    if(socket)
+      socket.emit("message:send",{
+     to: receiverId,
+     message: {...data.message, senderId: user?._id},
+      });
+  }
+  return data.message;
+});
 
 const initialState: MessageState = {};
 
@@ -39,9 +65,8 @@ const messageSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    addMessage: (state, action: PayloadAction<Message>) => {
+    addMessage: (state, action) => {
       const msg = action.payload;
-      if (!msg.conversationId) return;
       if (!state[msg.conversationId]) state[msg.conversationId] = [];
       state[msg.conversationId].push(msg);
     },
@@ -49,8 +74,7 @@ const messageSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchMessages.fulfilled, (state, action) => {
-        const conversationId = action.meta.arg; // arg from thunk call
-        state[conversationId] = action.payload;
+        state[action.payload.conversationId] = action.payload.messages;
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         const msg = action.payload;

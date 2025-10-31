@@ -5,6 +5,6 @@ import { getMessage, sendMessage } from "../controllers/messageController.js";
 const router = Router();
 
 router.route('/:conversationId').get(authMiddleware, sendMessage);
-router.route('/:conversationId').post(authMiddleware, getMessage);
+router.route('/').post(authMiddleware, getMessage);
 
 export default router;

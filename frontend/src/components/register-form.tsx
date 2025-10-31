@@ -17,7 +17,6 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import assets from "@/assets/assets";
-import { apiFetch } from "@/lib/api";
 
 export function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -30,9 +29,6 @@ export function RegisterForm() {
   const [loading, setLoading] = useState<Boolean>(false);
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -45,19 +41,28 @@ export function RegisterForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      const formDataToSend: FormData = new FormData();
+      const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
       formDataToSend.append("email", formData.email);
       formDataToSend.append("password", formData.password);
       if (file) formDataToSend.append("file", file);
 
+      console.log('formdata:',formDataToSend);
       // pass method as string and FormData as the body (apiFetch handles FormData)
-      const data = await apiFetch('/auth/register', 'POST', formDataToSend);
+      const res = await fetch(`${import.meta.env.VITE_APPLICATION_BACKEND_URL}/auth/register`, {
+        method: "POST",
+        body: formDataToSend,
+        credentials: 'include'
+      });
+
+      const data = await res.json();
 
       if(data.success){
         toast.success('Account created successfully')
          navigate("/login")
-        };
+        }else{
+          toast.error(data.message)
+        }
         
     } catch (error: any) {
       console.error("Error in user creation from frontend:", error);
@@ -89,7 +94,7 @@ export function RegisterForm() {
                 id="name"
                 type="text"
                 name="name"
-                onChange={handleChange}
+                onChange={(e)=>setFormData({...formData,name: e.target.value})}
                 placeholder="John Doe"
                 required
               />
@@ -99,7 +104,7 @@ export function RegisterForm() {
               <Input
                 id="email"
                 name="email"
-                onChange={handleChange}
+                onChange={(e) => setFormData({...formData,email: e.target.value})}
                 type="email"
                 placeholder="example@gmail.com"
                 required
@@ -110,7 +115,7 @@ export function RegisterForm() {
               <Input
                 id="password"
                 name="password"
-                onChange={handleChange}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
                 type="password"
                 required
               />

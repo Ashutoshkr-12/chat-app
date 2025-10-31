@@ -2,8 +2,9 @@ import Message from "../models/message.model.js";
 
 export const sendMessage = async (req, res) => {
   try {
-    const { conversationId, senderId, receiverId, text } = req.body;
+    const { conversationId, text } = req.body;
 
+    const senderId = req.user.id;
     if (!text) {
       res.json({ message: "message cannot be empty" });
     }
@@ -11,7 +12,6 @@ export const sendMessage = async (req, res) => {
     const message = await Message.create({
       conversationId,
       sender: senderId,
-      receiver: receiverId,
       text,
     });
 
@@ -34,7 +34,7 @@ export const getMessage = async(req,res)=>{
         const message = await Message.find({conversationId}).populate("sender","name profileImage")
 
         if(!message){
-            res.status(404).json({message: "No message yet"},{ success: false});
+            res.status(404).json({message: "No message yet", success: false});
         }
 
         return res.status(200).json({data: message})

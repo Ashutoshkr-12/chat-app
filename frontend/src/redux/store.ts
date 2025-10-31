@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
-import authReducer from '@/redux/authSlice'
-import requestReducer from '@/redux/authSlice'
-import conversationReducer from '@/redux/authSlice'
-import messageReducer from '@/redux/authSlice'
+import userReducer from '@/redux/authSlice'
+import requestReducer from '@/redux/requestSlice'
+import conversationReducer from '@/redux/conversationSlice'
+import messageReducer from '@/redux/messageSlice'
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
+    auth: userReducer,
     requests: requestReducer,
     conversations: conversationReducer,
     messages: messageReducer, 

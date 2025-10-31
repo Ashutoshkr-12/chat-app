@@ -4,7 +4,7 @@ import { acceptRequest, getRequest, rejectRequest, sendRequest } from '../contro
 
 const router = Router();
 
-router.route('/send/:receiverId').post(sendRequest);
+router.route('/send').post(authMiddleware, sendRequest);
 router.route('/received').get( authMiddleware, getRequest);
 router.route('/accept/:requestId').post( authMiddleware, acceptRequest);
 router.route('/reject/:requestId').post(authMiddleware,rejectRequest);

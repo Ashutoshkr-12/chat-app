@@ -2,10 +2,11 @@ import jwt from 'jsonwebtoken'
 
 const authMiddleware = (req,res,next) => {
     try {
-        const token = req.cookies.token;
+        const token = req.headers.authorization?.split(" ")[1];
 
+        //console.log('Auth header:',req.headers.authorization)
         if(!token){
-            res.status(404).json({
+           return res.status(404).json({
                 message:"Unauthorized",
                 error: true
             })
@@ -13,7 +14,7 @@ const authMiddleware = (req,res,next) => {
 
         const decode = jwt.verify(token,process.env.JWT_SECRET)
 
-        req.user = { id: decode.id, email: decode.email}
+        req.user = decode;
 
         next();
     } catch (error) {

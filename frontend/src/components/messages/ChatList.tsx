@@ -1,80 +1,89 @@
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { NavLink, useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import assets from "@/assets/assets";
-import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
-import { useEffect } from "react";
-import { fetchConversations } from "@/redux/conversationSlice";
+import { NavLink } from "react-router-dom";
+import { UserSearch } from "lucide-react";
+import { useAppSelector } from "@/hooks/hooks";
+import {jwtDecode} from "jwt-decode";
 
-type SidebarProps = {
-  chat: {
-    id: number;
-    name: string;
-    avatar: string;
-    lastMessage: string;
-    unreadCount: number;
-  }[];
-};
+interface ChatListProps {
+  chats: any[];
+  loading?: boolean;
+  onSelectChat: (chat: any) => void;
+}
 
-export default function ChatList({ chat }: SidebarProps) {
-  
-  const dispatch = useAppDispatch();
-  const chats = useAppSelector((state) => state.conversations);
-  const navigate = useNavigate();
-  
-  useEffect(()=>{
-dispatch(fetchConversations());
-  },[dispatch]);
-  
+export default function ChatList({
+  chats,
+  loading,
+  onSelectChat,
+}: ChatListProps) {
 
-  //TODO: change chat to selector chats...
-  return (
-    <div className="w-full h-full">
-      <div onClick={()=>navigate('/')} className="w-full h-18 flex  items-center">
-        <img className="w-46" src={assets.chatlogo} alt="" />
+ const token = useAppSelector((state) => state.auth.token);
+
+interface JwtPayload {
+  id?: string;
+  [key: string]: any;
+}
+
+const decodedUser = token ? jwtDecode<JwtPayload>(token) : null;
+
+const user = decodedUser;
+
+ //console.log(decodedUser);
+ 
+   if (!decodedUser) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-gray-500">Loading user...</p>
       </div>
-     <div className="border-b py-2 px-3 md:px-0">
-        <input type="text" className="border-1 border-green-500 rounded-lg  w-full py-2  px-3" placeholder="search user" />
-     </div>
-     
-    <ScrollArea className="h-full w-full px-2 ">
-      {chat.map((chat) => (
-        <NavLink key={chat.id} to={`/chat/${chat.id}`}>
-          {({ isActive }) => (
-            <Card
-            className={cn(
-              
-                "p-3  cursor-pointer rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex justify-between",
-                isActive && "bg-gray-200 dark:bg-gray-700"
-              )}
-            >
-              <div className="w-full flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src={chat.avatar} />
-                    <AvatarFallback>{chat.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">{chat.name}</p>
-                    <p className="text-sm text-gray-500 truncate w-32">
-                      {chat.lastMessage}
-                    </p>
-                  </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col w-full ">
+      <NavLink to={'/'}>
+      <div className="border-b px-2 flex items-center justify-start w-full h-20 ">
+        <img className="w-42 h-18 object-cover " src={assets.chatlogo} alt="logo" />
+        </div>
+        </NavLink>
+      <div className="overflow-y-auto">
+        {loading ? (
+          <p className="p-4">Loading chats...</p>
+        ) : !Array.isArray(chats) || chats.length === 0 ? (
+          <p className="p-4 flex gap-2 items-center"> <UserSearch />Find friends and chat</p>
+        ) : (
+          chats.map((chat) => {
+              const friend = chat.members.find((m: any) => m._id !== user?.id);
+               if (!friend) return null; 
+            return (
+              <NavLink to={`/chat/${chat._id}`}>
+              <div
+                key={chat?._id}
+                className="flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={() => onSelectChat(chat)}
+              >
+                <img
+                  src={friend.profileImage || "/default-avatar.png"}
+                  alt={friend.name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                    {friend.name}
+                  </h3>
+                  <p className="text-xs text-gray-500 truncate">
+                    {chat.lastMessage?.text || "No messages yet"}
+                  </p>
                 </div>
                 {chat.unreadCount > 0 && (
-                  <Badge className="bg-green-500 w-8 h-8 font-bold text-sm text-white rounded-full flex items-center justify-center">
+                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
                     {chat.unreadCount}
-                  </Badge>
+                  </span>
                 )}
               </div>
-            </Card>
-          )}
-        </NavLink>
-      ))}
-    </ScrollArea>
+              </NavLink>
+            );
+          })
+        )}
       </div>
+    </div>
   );
 }
