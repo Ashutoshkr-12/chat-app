@@ -1,27 +1,62 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { useParams } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { io } from "socket.io-client";
 
 interface MessagePageProps {
   selectedChat: any;
   onBack: () => void;
 }
 
+interface JwtPayload {
+  id?: string;
+  [key: string]: any;
+}
+
 export default function MessagePage({ selectedChat, onBack }: MessagePageProps) {
+  const { id: conversationId } = useParams(); // ✅ properly get :id from URL
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
-  const { user } = useSelector((state: RootState) => state.auth);
-  const socketRef = useRef<any>(null);
+  const token = useSelector((state: RootState) => state.auth.token);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const socketRef = useRef<any>(null);
 
+  // ✅ decode user
+  const decodedUser = token ? jwtDecode<JwtPayload>(token) : null;
+  const userId = decodedUser?.id;
 
+  // ✅ get the other user from selectedChat
+  const otherUser = selectedChat?.members?.find(
+    (m: any) => m._id !== userId
+  );
+
+  // ✅ connect socket
+  useEffect(() => {
+    if (!userId) return;
+
+    socketRef.current = io("http://localhost:5000"); // 🔁 your backend URL here
+    socketRef.current.emit("join_conversation", conversationId);
+
+    // receive messages
+    socketRef.current.on("receive_message", (msg: any) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [conversationId, userId]);
+
+  // ✅ send message
   const sendMessage = () => {
     if (!input.trim()) return;
 
     const msg = {
-      conversationId: selectedChat._id,
-      sender: user?._id,
-      text: input,
+      conversationId,
+      sender: userId,
+      text: input.trim(),
     };
 
     socketRef.current.emit("send_message", msg);
@@ -29,9 +64,18 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
     setInput("");
   };
 
+  // ✅ scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  if (!selectedChat) {
+    return (
+      <div className="flex items-center justify-center h-full text-gray-500">
+        Select a chat to start messaging
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -44,19 +88,13 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
           ←
         </button>
         <img
-          src={
-            selectedChat.sender._id === user?._id
-              ? selectedChat.receiver.profilePic
-              : selectedChat.sender.profilePic
-          }
+          src={otherUser?.profilePic || "/default-avatar.png"}
           alt="profile"
           className="w-10 h-10 rounded-full"
         />
         <div>
           <h3 className="text-sm font-medium">
-            {selectedChat.sender._id === user?._id
-              ? selectedChat.receiver.name
-              : selectedChat.sender.name}
+            {otherUser?.name || "Unknown User"}
           </h3>
         </div>
       </div>
@@ -67,12 +105,12 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
           <div
             key={idx}
             className={`flex ${
-              msg.sender === user?._id ? "justify-end" : "justify-start"
+              msg.sender === userId ? "justify-end" : "justify-start"
             }`}
           >
             <div
               className={`px-3 py-2 rounded-lg max-w-xs ${
-                msg.sender === user?._id
+                msg.sender === userId
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 dark:bg-gray-700 text-gray-900"
               }`}

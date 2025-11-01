@@ -54,9 +54,10 @@ const user = decodedUser;
               const friend = chat.members.find((m: any) => m._id !== user?.id);
                if (!friend) return null; 
             return (
-              <NavLink to={`/chat/${chat._id}`}>
-              <div
+              
+              <NavLink
                 key={chat?._id}
+                to={`/chat/${chat._id}`}
                 className="flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => onSelectChat(chat)}
               >
@@ -78,7 +79,7 @@ const user = decodedUser;
                     {chat.unreadCount}
                   </span>
                 )}
-              </div>
+             
               </NavLink>
             );
           })
