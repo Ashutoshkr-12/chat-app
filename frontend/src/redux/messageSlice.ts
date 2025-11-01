@@ -18,31 +18,33 @@ type MessageState = {
 const URL = import.meta.env.VITE_APPLICATION_BACKEND_URL
 
 
-export const fetchMessages = createAsyncThunk(
-  "messages/fetch",
-  async (conversationId: string) => {
-    const res = await fetch(`/messages/${conversationId}`, {
+export const fetchMessages = createAsyncThunk
+("messages/fetch", async (conversationId: string, { getState}) => {
+      const state = getState();
+      const token = state?.auth?.token;
+
+
+    const res = await fetch(`${URL}/messages/${conversationId}`, {
       method: "GET",
+      headers: { Authorization: `Bearer ${token}`},
       credentials: "include",
     });
     const data = await res.json();
+    //console.log('message data from slice:',data.data)
     return { conversationId, messages: data.data };
   }
 );
 
-export const sendMessage = createAsyncThunk<
-  Message,
-  { conversationId: string; text: string; receiverId: string },
-  { state: RootState }
->("messages/send", async ({ conversationId, receiverId, text }, { getState }) => {
+export const sendMessage = createAsyncThunk< Message, { conversationId: string | undefined; text: string; receiverId: string },{ state: RootState }>("messages/send", async ({conversationId, receiverId, text} , { getState }) => {
   const state = getState();
   const token = state.auth?.token;
   const user = state.auth?.user;
 
+  //console.log('conversationId from frontend:', conversationId);
   const res = await fetch(`${URL}/messages/${conversationId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`},
-    body: JSON.stringify({text}),
+    body: JSON.stringify({text, receiverId}),
     credentials: 'include'
   });
 

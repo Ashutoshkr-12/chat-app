@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
                 Component:  Homepage,
                 children: [
                     {
-                        path: '/chat/:id',
+                        path: '/chat/:conversationId',
                         Component: MessagePage
                     }
                 ]
