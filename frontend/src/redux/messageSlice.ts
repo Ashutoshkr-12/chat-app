@@ -18,10 +18,9 @@ type MessageState = {
 const URL = import.meta.env.VITE_APPLICATION_BACKEND_URL
 
 
-export const fetchMessages = createAsyncThunk
-("messages/fetch", async (conversationId: string, { getState}) => {
-      const state = getState();
-      const token = state?.auth?.token;
+export const fetchMessages = createAsyncThunk<{ conversationId: string; messages: Message[] }, string, { state: RootState }>("messages/fetch", async (conversationId: string, { getState}) => {
+      const state = getState() as RootState;
+      const token = state.auth?.token;
 
 
     const res = await fetch(`${URL}/messages/${conversationId}`, {
@@ -50,14 +49,16 @@ export const sendMessage = createAsyncThunk< Message, { conversationId: string |
 
   const data = await res.json();
 
-  if(data.success){
-    const socket = getSocket();
-    if(socket)
-      socket.emit("message:send",{
-     to: receiverId,
-     message: {...data.message, senderId: user?._id},
-      });
+ if (data.success) {
+  const socket = getSocket();
+  if (socket) {
+    socket.emit("message:send", {
+      conversationId,
+      text,  
+    });
   }
+}
+
   return data.message;
 });
 

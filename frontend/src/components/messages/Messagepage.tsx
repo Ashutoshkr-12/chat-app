@@ -29,8 +29,6 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
   const messageState  = useAppSelector((state) => state.messages)
 
   //console.log('messages:',messageState)
-  if(!conversationId) return;
-
 
   const currentMessages = conversationId ? messageState[conversationId] || [] : [];
 
@@ -57,7 +55,7 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
     }, [conversationId, userId, token]);
 
     useEffect(()=> {
-        dispatch(fetchMessages(conversationId))
+        dispatch(fetchMessages(conversationId!))
     },[conversationId])
 
   const sendMessage = () => {

@@ -14,9 +14,9 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { useAppDispatch } from "@/hooks/hooks"
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { NavLink, useNavigate } from "react-router-dom"
 import { loginUser} from '@/redux/authSlice'
@@ -28,23 +28,23 @@ type Form ={
 export function LoginForm() {
 
   const [form, setForm] = useState<Form>({ email: "", password: ""});
-  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const {  loading, token} = useAppSelector((state) => state.auth);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
-     const result = await dispatch(loginUser(form));
-     if(result.meta.requestStatus === 'fulfilled'){
-      toast.success("Login successful")
-        navigate("/")
-     }      
+     const res = await dispatch(loginUser(form));
+     if(loginUser.fulfilled.match(res)){
+      navigate('/')
+     }
     } catch (error) {
-      setLoading(false)
+      console.log(error);
     }
+      
   }
 
   return (
