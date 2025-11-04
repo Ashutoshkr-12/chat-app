@@ -33,6 +33,10 @@ io.on('connection',async (socket) => {
   socket.userId = user._id.toString();
   onlineUser.set(socket.userId,socket.id);
    //console.log("user online:", user._id);
+   io.emit("user-list", Array.from(onlineUser.keys()));
+
+   socket.broadcast.emit("user-online", socket.userId);
+   
 
   await User.findByIdAndUpdate(socket.userId, {
     online: true,
@@ -88,12 +92,13 @@ io.on('connection',async (socket) => {
 
     // const receiverSocket = onlineUser.get(receiverId);
     // if(receiverSocket) io.to(receiverSocket).emit("message-receive",populateMessage);
-    
   });
 
   socket.on("disconnect", async() => {
     await User.findByIdAndUpdate(socket.userId, {online: false});
     onlineUser.delete(socket.userId);
+    socket.broadcast.emit("user-offline", socket.userId);
+    io.emit("user-list", Array.from(onlineUser.keys()));
   });
 });
 

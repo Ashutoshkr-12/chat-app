@@ -2,9 +2,36 @@ import { MessageSquareText, UserSearch } from "lucide-react";
 import { PhoneCall } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { NavLink } from "react-router-dom";
+import { useAppSelector } from "@/hooks/hooks";
+import { useEffect, useState } from "react";
 
 
 const Sidebar = () => {
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const token = useAppSelector(state => state.auth.token);
+  
+  const currentUser = async() => {
+     try {
+      const res = await fetch(`${import.meta.env.VITE_APPLICATION_BACKEND_URL}/auth/user/me`,{
+        method: "GET",
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`},
+        credentials: 'include'
+      }); 
+
+      const data = await res.json();
+      if(!res.ok) console.error(data.message || 'something went wrong');
+      //console.log('profile data:',data)
+    
+      setProfilePic(data?.user?.profileImage);
+      
+    } catch (err) {
+      console.error(err);
+    } 
+  }
+  
+  useEffect(()=> {
+    currentUser();
+  },[])
 
   return (
     <nav className="fixed bottom-0 left-0 w-full bg-background border-t border-border p-2 md:p-0 md:top-0 md:left-0 md:h-full md:w-14 md:border-r md:border-t-0 z-10">
@@ -28,17 +55,16 @@ const Sidebar = () => {
             <span className="font-semibold">Find friends</span>
           </button>
         </NavLink>
-
         <NavLink to={"/profile"}>
           <Avatar className="w-10 h-10">
                 <AvatarImage
                   className="object-cover"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSLB3dCjzQJDBy3zYLaW77GavvTpWYrDNWhg&s"
+                  src={profilePic ?? undefined}
                 />
                 <AvatarFallback>You</AvatarFallback>
               </Avatar>
               </NavLink>
-        <button></button>
+        
       </div>
     </nav>
   );

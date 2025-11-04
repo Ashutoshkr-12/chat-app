@@ -3,10 +3,11 @@ import userReducer from '@/redux/authSlice'
 import requestReducer from '@/redux/requestSlice'
 import conversationReducer from '@/redux/conversationSlice'
 import messageReducer from '@/redux/messageSlice'
-
+import onlineStatusReducer from '@/redux/onlineStatusSlice'
 export const store = configureStore({
   reducer: {
     auth: userReducer,
+    online: onlineStatusReducer,
     requests: requestReducer,
     conversations: conversationReducer,
     messages: messageReducer, 

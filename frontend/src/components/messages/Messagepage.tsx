@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import type { RootState } from "@/redux/store";
 import { useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { io } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
-import { addMessage, fetchMessages, sendMessage as sendMessageThunk } from "@/redux/messageSlice";
+import { fetchMessages, sendMessage as sendMessageThunk } from "@/redux/messageSlice";
 import { emitSendMessage, joinConversation, messageListner } from "@/socket/listener";
 import { getSocket } from "@/socket/socket";
+import { ArrowLeft } from "lucide-react";
 
 interface MessagePageProps {
   selectedChat: any;
@@ -28,11 +28,9 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
   const decodedUser = token ? jwtDecode<JwtPayload>(token) : null;
   const userId = decodedUser?.id;
   const messageState  = useAppSelector((state) => state.messages)
-
   //console.log('messages:',messageState)
 
   const currentMessages = conversationId ? messageState[conversationId] || [] : [];
-
 
   const otherUser = selectedChat?.members?.find((m: any) => m._id !== userId);
 
@@ -55,7 +53,7 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
 
 const sendMessage = () => {
   if (!text.trim() || !conversationId || !userId) return;
- 
+
   emitSendMessage(conversationId, userId,otherUser._id, text);
 
 //   dispatch(addMessage({
@@ -77,6 +75,7 @@ const sendMessage = () => {
   setText("");
 };
 
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messageState]);
@@ -94,8 +93,8 @@ const sendMessage = () => {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b bg-white dark:bg-gray-800">
-        <button onClick={onBack} className="md:hidden text-gray-700 dark:text-gray-300">
-          ←
+        <button onClick={onBack}  className="md:hidden text-gray-700 dark:text-gray-300">
+          <ArrowLeft />
         </button>
         <img
           src={otherUser?.profileImage || "/default-avatar.png"}

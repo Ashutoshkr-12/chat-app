@@ -47,6 +47,10 @@ export const getMessage = async(req,res)=>{
             res.status(404).json({message: "No message yet", success: false});
         }
 
+        await Message.updateMany(
+      { conversationId, receiver: userId, seen: false },
+      { $set: { seen: true } }
+    );
         return res.status(200).json({data: message})
     } catch (error) {
         console.error('Error in fetching messages');

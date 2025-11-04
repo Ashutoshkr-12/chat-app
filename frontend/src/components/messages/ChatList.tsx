@@ -15,19 +15,19 @@ export default function ChatList({
   loading,
   onSelectChat,
 }: ChatListProps) {
-
- const token = useAppSelector((state) => state.auth.token);
-
+  
 interface JwtPayload {
   id?: string;
   [key: string]: any;
 }
 
+ const token = useAppSelector((state) => state.auth.token);
+ const {onlineUsers } = useAppSelector(state => state.online);
 const decodedUser = token ? jwtDecode<JwtPayload>(token) : null;
 const user = decodedUser;
 
  //console.log(decodedUser);
- 
+
    if (!decodedUser) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -51,31 +51,40 @@ const user = decodedUser;
         ) : (
           chats.map((chat) => {
               const friend = chat.members.find((m: any) => m._id !== user?.id);
+              const isOnline = onlineUsers.includes(friend?._id)
                if (!friend) return null; 
             return (
               
               <NavLink
                 key={chat?._id}
                 to={`/chat/${chat._id}`}
-                className="flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="flex items-center border-b gap-3 py-5 px-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => onSelectChat(chat)}
               >
                 <img
                   src={friend.profileImage || "/default-avatar.png"}
                   alt={friend.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-12 h-12 rounded-full object-cover"
                 />
-                <div className="flex-1">
-                  <h3 className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                <div className="flex-1 ">
+                  <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100">
                     {friend.name}
                   </h3>
-                  <p className="text-xs text-gray-500 truncate">
-                    {chat.lastMessage?.text || "No messages yet"}
+                  {isOnline ? (
+                  
+                  <p className="text-md font-bold text-green-500 ">
+                    online
                   </p>
+                  ) : (
+                  <p className="text-md font-bold text-gray-600 ">
+                    offline
+                  </p>
+                )}
+          
                 </div>
-                {chat.unreadCount > 0 && (
-                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                    {chat.unreadCount}
+                {2 > 0 && (
+                  <span className="bg-blue-500 text-white text-xs px-3 py-2 rounded-full">
+                    1
                   </span>
                 )}
              

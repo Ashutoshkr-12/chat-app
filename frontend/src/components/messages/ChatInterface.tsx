@@ -5,12 +5,10 @@ import { cn } from "@/lib/utils";
 import { fetchConversations } from "@/redux/conversationSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { getSocket } from "@/socket/socket";
-import { addIncomingRequest } from "@/redux/requestSlice";
-import { addMessage } from "@/redux/messageSlice";
+import { addOnlineUser, removeOnlineUser, setOnlineUsers } from "@/redux/onlineStatusSlice";
 
 export default function ChatInterface() {
   const dispatch = useAppDispatch();
-
   const { list, status } = useAppSelector(state => state.conversations);
   const loading = status === 'loading';
   
@@ -20,39 +18,24 @@ export default function ChatInterface() {
     const socket = getSocket();
     if(!socket) return;
 
-    socket.on("request:received", (data)=>{
-      dispatch(addIncomingRequest(data.from));
+    socket.on("user-list", (users) => {
+      dispatch(setOnlineUsers(users));
     })
 
-    socket.on("request:accepted", (data) => {
-      dispatch(fetchConversations());
-      console.log('Accepted request:'), data
+    socket.on("user-online", (userId) => {
+      //console.log('user online:',userId);
+      dispatch(addOnlineUser(userId));
     });
 
-    socket.on("conversation:new",(conv) => {
-      console.log('new Convo:', conv);
-      //dispatch(addConversation(conv))
-    });
-
-    socket.on("message:receive", (msg) => {
-      console.log('new message:', msg);
-      dispatch(addMessage(msg))
-    });
-
-    socket.on("user:online", (userId) => {
-      console.log('user online:',userId);
-    });
-
-    socket.on("user:offline", (userId) => {
-      console.log('offline user:', userId);
+    socket.on("user-offline", (userId) => {
+     // console.log('offline user:', userId);
+      dispatch(removeOnlineUser(userId));
     });
 
     return ()=> {
-     socket.off("request:received");
-      socket.off("request:accepted");
-      socket.off("message:receive");
-      socket.off("user:online");
-      socket.off("user:offline");
+      socket.off("user-list");
+      socket.off("user-online");
+      socket.off("user-offline");
     }
 
   },[])

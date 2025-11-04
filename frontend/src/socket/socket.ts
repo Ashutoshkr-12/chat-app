@@ -44,8 +44,10 @@ export const initSocket = (token: string) => {
         transports: ["websocket"],
     });
 
-    socket.on("connect", () => console.log("socketId:", socket?.id))
-    socket.on("disconnect", ()=> console.log("Socket disconnected"));
+    socket.on("connect", () => {} //console.log("socketId:", socket?.id)
+    )
+    socket.on("disconnect", ()=> {} //console.log("Socket disconnected")
+    );
 
     return socket;
 }
