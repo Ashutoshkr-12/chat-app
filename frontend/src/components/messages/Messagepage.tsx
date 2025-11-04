@@ -3,7 +3,7 @@ import type { RootState } from "@/redux/store";
 import { useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
-import { fetchMessages, sendMessage as sendMessageThunk } from "@/redux/messageSlice";
+import { fetchMessages  } from "@/redux/messageSlice";
 import { emitSendMessage, joinConversation, messageListner } from "@/socket/listener";
 import { getSocket } from "@/socket/socket";
 import { ArrowLeft } from "lucide-react";
@@ -108,7 +108,7 @@ const sendMessage = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-x-scroll overflow-y-scroll  no-scrollbar p-4 space-y-3">
         {currentMessages?.map((msg: any, idx: number) => (
           <div
             key={idx}

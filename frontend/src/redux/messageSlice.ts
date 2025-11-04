@@ -29,7 +29,7 @@ export const fetchMessages = createAsyncThunk<{ conversationId: string; messages
       credentials: "include",
     });
     const data = await res.json();
-    //console.log('message data from slice:',data.data)
+   // console.log('message data from slice:',data)
     return { conversationId, messages: data.data };
   }
 );
@@ -37,7 +37,7 @@ export const fetchMessages = createAsyncThunk<{ conversationId: string; messages
 export const sendMessage = createAsyncThunk< Message, { conversationId: string | undefined; text: string; receiverId: string },{ state: RootState }>("messages/send", async ({conversationId, receiverId, text} , { getState }) => {
   const state = getState();
   const token = state.auth?.token;
-  const user = state.auth?.user;
+
 
   //console.log('conversationId from frontend:', conversationId);
   const res = await fetch(`${URL}/messages/${conversationId}`, {

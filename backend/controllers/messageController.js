@@ -43,15 +43,16 @@ export const getMessage = async(req,res)=>{
         const message = await Message.find({conversationId}).populate("sender","name profileImage")
 
         //console.log('messages from server:', message)
-        if(!message){
-            res.status(404).json({message: "No message yet", success: false});
-        }
+        if (message.length === 0) {
+  return res.status(404).json({ message: "No messages yet", success: false });
+}
 
-        await Message.updateMany(
-      { conversationId, receiver: userId, seen: false },
-      { $set: { seen: true } }
-    );
-        return res.status(200).json({data: message})
+
+    //     await Message.updateMany(
+    //   { conversationId, receiver: userId, seen: false },
+    //   { $set: { seen: true } }
+    // );
+        return res.status(200).json({success: true, data: message})
     } catch (error) {
         console.error('Error in fetching messages');
         return res.status(500).json({ error: true, message: "unable to fetch error from server"},{ success: false});

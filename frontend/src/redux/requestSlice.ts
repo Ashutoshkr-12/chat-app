@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "@/redux/store";
 import toast from "react-hot-toast";
-import { getSocket } from "@/socket/socket";
 import { emitSendRequest } from "@/socket/listener";
 import { jwtDecode } from "jwt-decode";
 

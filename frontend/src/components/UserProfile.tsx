@@ -1,5 +1,5 @@
 import { useAppSelector } from "@/hooks/hooks";
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 
 interface UserProfile {
   _id: string;
@@ -70,10 +70,10 @@ const ProfilePage = () => {
     getUserProfile();
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //const file = e.target.files?.[0];
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   //const file = e.target.files?.[0];
     
-  };
+  // };
 
   if (loading && !user) return <p className="w-full h-screen flex items-center justify-center mt-6">Loading...</p>;
 

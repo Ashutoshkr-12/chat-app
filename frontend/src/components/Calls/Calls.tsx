@@ -21,11 +21,11 @@ const dummyUsers: User[] = [
   },
 ];
 
-const currentUser: User = {
-  id: "0",
-  name: "You",
-  avatar: "https://i.pravatar.cc/100?img=1",
-};
+// const currentUser: User = {
+//   id: "0",
+//   name: "You",
+//   avatar: "https://i.pravatar.cc/100?img=1",
+// };
 
 export default function CallPage() {
   const [inCall, setInCall] = useState(false);

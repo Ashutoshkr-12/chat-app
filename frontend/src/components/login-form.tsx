@@ -16,8 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks"
 
-import { useEffect, useState } from "react"
-import toast from "react-hot-toast"
+import {  useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { loginUser} from '@/redux/authSlice'
 
@@ -31,7 +30,7 @@ export function LoginForm() {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const {  loading, token} = useAppSelector((state) => state.auth);
+  const {  loading} = useAppSelector((state) => state.auth);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
