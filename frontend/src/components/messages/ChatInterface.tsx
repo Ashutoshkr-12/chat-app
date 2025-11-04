@@ -11,12 +11,12 @@ export default function ChatInterface() {
   const dispatch = useAppDispatch();
   const { list, status } = useAppSelector(state => state.conversations);
   const loading = status === 'loading';
-  
   const [selectedChat, setSelectedChat] = useState<any>(null);
 
+  //console.log('selected chat from chat interface:', selectedChat);
   useEffect(()=>{
     const socket = getSocket();
-    if(!socket) return;
+    if(!socket || !selectedChat) return;
 
     socket.on("user-list", (users) => {
       dispatch(setOnlineUsers(users));
@@ -31,6 +31,11 @@ export default function ChatInterface() {
      // console.log('offline user:', userId);
       dispatch(removeOnlineUser(userId));
     });
+
+    // socket.emit("message-seen", {
+    //   conversationId: selectedChat._id,
+    //   userId:
+    // })
 
     return ()=> {
       socket.off("user-list");

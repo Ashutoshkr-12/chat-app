@@ -94,6 +94,23 @@ io.on('connection',async (socket) => {
     // if(receiverSocket) io.to(receiverSocket).emit("message-receive",populateMessage);
   });
 
+
+  //seen functionality
+  socket.on("message-seen", async ({ conversationId, userId}) => {
+    await Message.updateMany({ conversationId, receiver: userId, seen: false},
+      {$set: { seen: true}}
+    );
+
+    //notify that message is seen
+    const conversation = await Conversation.findById(conversationId);
+    const senderId = conversation.members.find(id => id.toString() !== userId);
+
+    const senderSocket = onlineUser.get(senderId.toString());
+    if(senderSocket) io.to(senderSocket).emit("message-seen", { conversationId});
+  })
+
+  
+
   socket.on("disconnect", async() => {
     await User.findByIdAndUpdate(socket.userId, {online: false});
     onlineUser.delete(socket.userId);

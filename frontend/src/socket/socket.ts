@@ -1,6 +1,8 @@
 import { io } from "socket.io-client"
 import type { Socket } from "socket.io-client";
 import type { Dispatch } from "redux";
+import { store } from "@/redux/store";
+import { addOnlineUser, removeOnlineUser, setOnlineUsers } from "@/redux/onlineStatusSlice";
 
 // export interface IncomingRequest {
 //     id: string;
@@ -48,6 +50,21 @@ export const initSocket = (token: string) => {
     )
     socket.on("disconnect", ()=> {} //console.log("Socket disconnected")
     );
+
+    socket.on("user-list", (users: string[]) => {
+       // console.log('online User:', users);
+        store.dispatch(setOnlineUsers(users));
+    });
+
+    socket.on("user-online",(userId: string) => {
+        //console.log('user online:', userId);
+        store.dispatch(addOnlineUser(userId));
+    });
+
+    socket.on("user-online", (userId: string) => {
+       // console.log('user ooffline:', userId);
+        store.dispatch(removeOnlineUser(userId));
+    })
 
     return socket;
 }

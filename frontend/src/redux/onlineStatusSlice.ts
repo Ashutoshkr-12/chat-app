@@ -1,25 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface OnlineState {
-    onlineUsers: string[];
+    users: string[];
 }
 
-const initialState: OnlineState = { onlineUsers: []};
+const initialState: OnlineState = { users: []};
 
 const onlineStatusSlice = createSlice({
     name: "online",
     initialState,
     reducers: {
         setOnlineUsers: (s,a) => {
-            s.onlineUsers = a.payload;
+            s.users = a.payload;
         },
         addOnlineUser: (s,a) => {
-            if(!s.onlineUsers.includes(a.payload)){
-                s.onlineUsers.push(a.payload);
+            if(!s.users.includes(a.payload)){
+                s.users.push(a.payload);
             }
         },
         removeOnlineUser: (s,a) => {
-            s.onlineUsers = s.onlineUsers.filter((id) => id !== a.payload);
+            s.users = s.users.filter((id) => id !== a.payload);
         }
     }
 });

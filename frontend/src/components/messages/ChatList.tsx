@@ -22,10 +22,10 @@ interface JwtPayload {
 }
 
  const token = useAppSelector((state) => state.auth.token);
- const {onlineUsers } = useAppSelector(state => state.online);
+ const onlineUsers = useAppSelector(state => state.online.users);
+ //console.log('online user:',onlineUsers)
 const decodedUser = token ? jwtDecode<JwtPayload>(token) : null;
 const user = decodedUser;
-
  //console.log(decodedUser);
 
    if (!decodedUser) {
@@ -82,11 +82,11 @@ const user = decodedUser;
                 )}
           
                 </div>
-                {2 > 0 && (
+                {/* {2 > 0 && (
                   <span className="bg-blue-500 text-white text-xs px-3 py-2 rounded-full">
                     1
                   </span>
-                )}
+                )} */}
              
               </NavLink>
             );
