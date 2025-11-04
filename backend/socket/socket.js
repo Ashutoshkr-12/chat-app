@@ -1,103 +1,100 @@
-import express from 'express';
+import express from 'express'
+import http from 'http'
 import { Server } from 'socket.io';
-import http from 'http';
-import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
+import jwt from 'jsonwebtoken'
 import Message from '../models/message.model.js';
-import Conversation from '../models/conversation.model.js';
-import MessageRequest from '../models/request.model.js';
+
+
 
 const app = express();
-const server = http.createServer(app);
 
+const server = http.createServer(app)
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
-});
-
-const userSocketMap = new Map(); 
+    origin: process.env.FRONTEND_URL,
+    Credential: true,
+    // methods: ['GET', 'POST'],
+  }
+})
 
 
-io.use(async (socket, next) => {
-  try {
-    const token = socket.handshake.auth?.token;
-    if (!token) return next(new Error("Unauthorized: No token"));
+const onlineUser = new Map();
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-    if (!user) return next(new Error("User not found"));
+io.on('connection',async (socket) => {
+  //console.log('connect user:', socket.id)
 
-    socket.userId = user._id.toString();
-    userSocketMap.set(socket.userId, socket.id);
+  const token = socket.handshake.auth.token;
+  if(!token) return socket.disconnect();
 
-    await User.findByIdAndUpdate(socket.userId, {
-      online: true,
-      socketId: socket.id,
+  const decode = await jwt.verify(token, process.env.JWT_SECRET)
+  const user = await User.findById(decode.id);
+
+  socket.userId = user._id.toString();
+  onlineUser.set(socket.userId,socket.id);
+   //console.log("user online:", user._id);
+
+  await User.findByIdAndUpdate(socket.userId, {
+    online: true,
+    socketId: socket.id,
+  })
+
+  socket.on("request-send", async ({ to , from}) => {
+    const receiverSocket = onlineUser.get(to);
+
+    if(receiverSocket){
+      try {
+        const sender = await User.findById(from).select('name email profileImage')
+        io.to(receiverSocket).emit("request-receive", { from: {
+          _id: sender._id,
+          name: sender.name,
+          profileImage: sender.profileImage,
+          email: sender.email
+        }});
+
+      
+      } catch (error) {
+          console.error('Error sending request from socket server:', err.message);
+      }
+      //console.log(`requets send from ${from} to ${to}`)
+    }
+  });
+
+  socket.on("request:accept", async ({ from, to, conversation }) => {
+    const senderSocket = onlineUser.get(from);
+    const receiverSocket = onlineUser.get(to);
+
+    // send to both users to update conversation list
+    if (senderSocket) io.to(senderSocket).emit("conversation:new", conversation);
+    if (receiverSocket) io.to(receiverSocket).emit("conversation:new", conversation);
+  });
+
+  socket.on("join-conversation", ({ conversationId}) => {
+    socket.join(conversationId);
+    //console.log(`user ${socket.userId} joined ${conversationId}`)
+  });
+
+  socket.on("message-send", async ({ conversationId, senderId, receiverId, text}) => {
+    const message = await Message.create({
+      conversationId,
+      sender: senderId,
+      receiver: receiverId,
+      text,
     });
 
-    next();
-  } catch (err) {
-    console.error("Socket Auth Error:", err.message);
-    next(new Error("Unauthorized"));
-  }
-});
+    const populateMessage = await message.populate("sender", "name profileImage email")
 
+    io.to(conversationId).emit("message-receive", populateMessage);
 
-io.on("connection", (socket) => {
-  //console.log("Connected user:", socket.userId);
-
-  // join all conversations the user is part of (optional)
-  Conversation.find({ members: socket.userId })
-    .then((convs) => {
-      convs.forEach((conv) => socket.join(conv._id.toString()));
-    })
-    .catch(() => {});
-
-
- socket.on("message:send", async ({ conversationId, text }) => {
-  if (!conversationId || !text) return;
-
-  const message = await Message.create({
-    conversationId,
-    senderId: socket.userId,
-    text,
+    // const receiverSocket = onlineUser.get(receiverId);
+    // if(receiverSocket) io.to(receiverSocket).emit("message-receive",populateMessage);
+    
   });
 
-  const populatedMessage = await message.populate("senderId", "name profileImage");
-
-  io.to(conversationId).emit("message:receive", populatedMessage);
-
-  await Conversation.findByIdAndUpdate(conversationId, {
-    lastMessage: populatedMessage._id,
-    updatedAt: new Date(),
+  socket.on("disconnect", async() => {
+    await User.findByIdAndUpdate(socket.userId, {online: false});
+    onlineUser.delete(socket.userId);
   });
 });
 
-
-  socket.on("request:send", ({ from, to }) => {
-    const receiverSocket = userSocketMap.get(to);
-    if (receiverSocket) {
-      io.to(receiverSocket).emit("request:received", { from });
-    }
-  });
-
- 
-  socket.on("request:accept", ({ from, to, conversation }) => {
-    const senderSocket = userSocketMap.get(from);
-    if (senderSocket) {
-      io.to(senderSocket).emit("request:accepted", { to, conversation });
-    }
-  });
-
-  socket.on("disconnect", async () => {
-   // console.log(" User disconnected:", socket.userId);
-    userSocketMap.delete(socket.userId);
-    await User.findByIdAndUpdate(socket.userId, { online: false });
-    io.emit("user:offline", socket.userId);
-  });
-});
-
-export { app, server, io };
+export {app, server}

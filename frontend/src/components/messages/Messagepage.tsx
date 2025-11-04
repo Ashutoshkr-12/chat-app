@@ -5,6 +5,8 @@ import { jwtDecode } from "jwt-decode";
 import { io } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { addMessage, fetchMessages, sendMessage as sendMessageThunk } from "@/redux/messageSlice";
+import { emitSendMessage, joinConversation, messageListner } from "@/socket/listener";
+import { getSocket } from "@/socket/socket";
 
 interface MessagePageProps {
   selectedChat: any;
@@ -22,7 +24,6 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
   const [text, setText] = useState("");
   const token = useAppSelector((state: RootState) => state.auth.token);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const socketRef = useRef<any>(null);
   const dispatch = useAppDispatch();
   const decodedUser = token ? jwtDecode<JwtPayload>(token) : null;
   const userId = decodedUser?.id;
@@ -38,47 +39,43 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
   // socket connection
     useEffect(() => {
       if (!conversationId || !userId || !token) return;
-  
-      socketRef.current = io(import.meta.env.VITE_BACKEND_URL, {
-        auth: { token },
-      });
-  
-      socketRef.current.emit("join_conversation", { conversationId });
-  
-      socketRef.current.on("message:receive", (msg: any) => {
-       dispatch(addMessage(msg));
-      });
-  
-      return () => {
-        socketRef.current.disconnect();
-      };
+      joinConversation(conversationId);
+      dispatch(fetchMessages(conversationId))
+
+       return ()=> {
+    const socket = getSocket();
+    socket?.off("message-receive");
+  }
     }, [conversationId, userId, token]);
 
-    useEffect(()=> {
-        dispatch(fetchMessages(conversationId!))
-    },[conversationId])
-
-  const sendMessage = () => {
-    if (!text.trim() || !socketRef.current) return;
+    useEffect(()=>{
+      messageListner(dispatch);
+    },[])
 
 
-socketRef.current.on("message:receive", (msg: any) => {
-  dispatch(addMessage(msg));
-});
+const sendMessage = () => {
+  if (!text.trim() || !conversationId || !userId) return;
+ 
+  emitSendMessage(conversationId, userId,otherUser._id, text);
 
-   
-   
-   // console.log('conversationId from messagePage:', conversationId);
+//   dispatch(addMessage({
+//     conversationId,
+//     sender: { _id: userId },
+//     receiver: otherUser._id,
+//     text,
+//   })
+// );
 
-    dispatch(
-      sendMessageThunk({
-        conversationId,
-        text: text,
-        receiverId: otherUser?._id,
-      })
-    );
-    setText("");
-  };
+  // dispatch(
+  //   sendMessageThunk({
+  //     conversationId,
+  //     text: text,
+  //     receiverId: otherUser?._id,
+  //   })
+  // );
+
+  setText("");
+};
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -101,7 +98,7 @@ socketRef.current.on("message:receive", (msg: any) => {
           ←
         </button>
         <img
-          src={otherUser?.profilePic || "/default-avatar.png"}
+          src={otherUser?.profileImage || "/default-avatar.png"}
           alt="profile"
           className="w-10 h-10 rounded-full"
         />

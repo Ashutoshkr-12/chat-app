@@ -1,5 +1,6 @@
-import { useAppDispatch } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import {  sendRequest } from "@/redux/requestSlice";
+import { getSocket } from "@/socket/socket";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -9,6 +10,8 @@ const SendRequest = () => {
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
+  //console.log('user from send request:', user);
  
 
 
@@ -44,14 +47,17 @@ const SendRequest = () => {
     try {
       //console.log('receiverId:',receiverId);
       dispatch(sendRequest(receiverId));
-     
     } catch (error) {
       setStatus("Error sending request. Please try again.");
     }
   };
 
-  useEffect(() => {
-    handleSearchUser();
+
+useEffect(() => {
+    const timeout = setTimeout(() => {
+      handleSearchUser();
+    }, 500); 
+    return () => clearTimeout(timeout);
   }, [search]);
 
   return (

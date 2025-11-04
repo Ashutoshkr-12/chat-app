@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "@/redux/store";
 import toast from "react-hot-toast";
 import { getSocket } from "@/socket/socket";
+import { emitSendRequest } from "@/socket/listener";
+import { jwtDecode } from "jwt-decode";
 
 type RequestItem = { _id: string; [key: string]: any };
 
@@ -10,6 +12,11 @@ interface RequestState {
   outgoing?: RequestItem[];
   loading: boolean;
   error?: string | null;
+}
+
+interface JwtPayload {
+  id?: string;
+  [key: string]: any;
 }
 
 const URL = import.meta.env.VITE_APPLICATION_BACKEND_URL;
@@ -44,8 +51,9 @@ export const fetchRequests = createAsyncThunk<RequestItem[], void, { state: Root
 export const sendRequest = createAsyncThunk< RequestItem, string, { state: RootState; rejectValue: string }>("requests/send", async (receiverId, { getState, rejectWithValue }) => {
   try {
     const state = getState();
-    const token = state.auth?.token;
-    const user = state.auth?.user;
+    const token: string = state.auth?.token as string;
+    const decode = jwtDecode<JwtPayload>(token)
+    const user = decode
 
     if (!token) {
       const message = "Unable to access token, please re-login";
@@ -68,8 +76,8 @@ export const sendRequest = createAsyncThunk< RequestItem, string, { state: RootS
       return rejectWithValue(message);
     }
 
-    const socket = getSocket();
-    if (socket) socket.emit("request:send", { to: receiverId, from: user?._id });
+    //console.log('request slice data:', receiverId, user?.id);
+    emitSendRequest(receiverId, user.id as string)
 
     toast.success("Request sent successfully");
     return data;
@@ -86,6 +94,7 @@ export const acceptRequest = createAsyncThunk< RequestItem, string, { state: Roo
     const state = getState();
     const token = state.auth?.token;
 
+    
     const res = await fetch(`${URL}/request/accept/${requestId}`, {
       method: "POST",
       headers: {
@@ -102,13 +111,13 @@ export const acceptRequest = createAsyncThunk< RequestItem, string, { state: Roo
       return rejectWithValue(message);
     }
 
-    const socket = getSocket();
-    if (socket)
-      socket.emit("request:accept", {
-        from: data.request.from,
-        to: data.request.to,
-        conversation: data.data,
-      });
+    // const socket = getSocket();
+    // if (socket)
+    //   socket.emit("request:accept", {
+    //     from: data.request.from,
+    //     to: data.request.to,
+    //     conversation: data.data,
+    //   });
 
     toast.success("Request accepted");
     return data.request;

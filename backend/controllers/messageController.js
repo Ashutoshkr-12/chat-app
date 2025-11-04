@@ -1,5 +1,6 @@
 import Message from "../models/message.model.js";
 
+
 export const sendMessage = async (req, res) => {
   try {
     const { conversationId} = req.params;
@@ -11,7 +12,7 @@ export const sendMessage = async (req, res) => {
     }
 
    // console.log('senderId and conversationId from server:', senderId , conversationId)
-    
+
     if (!text) {
       res.json({ message: "message cannot be empty" });
     }
@@ -22,9 +23,9 @@ export const sendMessage = async (req, res) => {
       receiver: receiverId,
       text,
     });
-    
+
     return res.status(200).json({ message: "Message sent", data: message });
-  
+
   } catch (error) { 
     console.error("Error in sending message from server:", error);
     return res

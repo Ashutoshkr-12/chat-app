@@ -1,8 +1,20 @@
 import { Outlet } from 'react-router-dom'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from 'react-hot-toast';
+import { useEffect } from 'react';
+import { getSocket, initSocket } from './socket/socket';
+import { messageListner, receiveRequest } from './socket/listener';
+import { useAppDispatch, useAppSelector } from './hooks/hooks';
+
 function App() {
- 
+
+  const { token } = useAppSelector((state) => state.auth);
+  // console.log('token from mainpage:',token)
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if(token) initSocket(token);
+  },[token, dispatch]);
+
 
   return (
   <>
@@ -11,7 +23,6 @@ function App() {
   <main>
     <Outlet/>
   </main>
-  
     </ThemeProvider>
   </>
   )

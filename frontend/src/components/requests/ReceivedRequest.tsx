@@ -2,10 +2,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { acceptRequest, fetchRequests } from "@/redux/requestSlice";
 import  { useEffect, useState } from "react";
 
-interface Request {
-  id: string;
-  fromUser: string;
-}
+
 
 const ReceivedRequests = () => {
   const [loading, setLoading] = useState(false);
@@ -20,6 +17,7 @@ const ReceivedRequests = () => {
 
   const handleAccept = (requestId: string) => {
     setLoading(true);
+    //console.log('requested Id',requestId)
     try {
       dispatch(acceptRequest(requestId as any))
     } catch (err) {
@@ -37,21 +35,38 @@ const ReceivedRequests = () => {
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
-      ) : Array.isArray(incoming) && incoming.length > 0 ? (
-          incoming.map((req) => (
-          <div
-            key={req.id}
-            className="flex justify-between items-center border-b py-2"
-          >
-            <span>{req.from?.name}</span>
-            <button
-              onClick={() => handleAccept(req._id)}
-              className="bg-green-500 text-white px-3 py-1 rounded-md"
+      ) : Array.isArray(incoming) && incoming.length > 0 ? 
+      (
+         <ul className="mb-3 space-y-2 h-screen ">
+          {incoming.map((req) => (
+         <li
+              key={req._id}
+              className="flex items-center justify-between border p-2 rounded-lg"
             >
+            <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-12 h-12 rounded-full ">
+                  <img
+                    className="rounded-full w-full h-full object-cover"
+                    src="https://img.freepik.com/free-photo/portrait-happy-smiling-woman-standing-square-sunny-summer-spring-day-outside-cute-smiling-woman-looking-you-attractive-young-girl-enjoying-summer-filtered-image-flare-sunshine_231208-6734.jpg?semt=ais_hybrid&w=740&q=80"
+                    alt="profilepic"
+                  />
+                </div>
+                <div>
+                  <p className="font-medium">{req.from.name}</p>
+                  <p className="text-sm text-gray-500">{req.from.email}</p>
+                </div>
+              </div>
+            <button
+                  type="button"
+              onClick={() => handleAccept(req._id)}
+              className="bg-green-500 text-white hover:bg-black  px-3 py-1 rounded-md"
+              >
               Accept
             </button>
-          </div>
-        ))
+           
+          </li>
+          ))}
+        </ul>
       ) : (
         <p className="text-gray-500 text-center">No pending requests.</p>
       )}

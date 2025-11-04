@@ -24,7 +24,6 @@ interface JwtPayload {
 }
 
 const decodedUser = token ? jwtDecode<JwtPayload>(token) : null;
-
 const user = decodedUser;
 
  //console.log(decodedUser);

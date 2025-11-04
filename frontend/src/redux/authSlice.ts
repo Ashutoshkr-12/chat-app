@@ -16,7 +16,6 @@ interface LoginState {
   error: string | null;
 }
 
-
 export const loginUser = createAsyncThunk(
   "user/loginUser",
   async (
@@ -75,7 +74,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user; 
         state.token = action.payload.token;
-        initSocket(action.payload.token);
+        initSocket(action.payload.token); // sending to sockets
         localStorage.setItem("token", action.payload.token);
         toast.success("Login successful ");
       })

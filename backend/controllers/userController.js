@@ -134,7 +134,7 @@ const loginUser = async(req,res) =>{
          message:"User logged In",
          token,
          data: userObj,
-     })
+     }, { success: true})
 
    } catch (error) {
     console.error("Error in user login from server:", error.message);

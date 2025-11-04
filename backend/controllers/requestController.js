@@ -17,7 +17,7 @@ export const sendRequest = async (req, res) => {
     ] });
 
     if (alreadyRequest) {
-       res.status(400).json({
+       return res.status(400).json({
         error: true,
         message: "Request already sent",
         success: false
