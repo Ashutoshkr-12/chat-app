@@ -40,15 +40,14 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
       joinConversation(conversationId);
       dispatch(fetchMessages(conversationId))
 
+      messageListner(dispatch);
        return ()=> {
     const socket = getSocket();
     socket?.off("message-receive");
   }
     }, [conversationId, userId, token]);
 
-    useEffect(()=>{
-      messageListner(dispatch);
-    },[])
+ 
 
 
 const sendMessage = () => {
