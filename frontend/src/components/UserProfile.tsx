@@ -15,9 +15,10 @@ const ProfilePage = () => {
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(false);
   const token = useAppSelector(state => state.auth.token);
-  // console.log(token)
 
+  // console.log(token)
   // fetch current user details
+
   const getUserProfile = async () => {
     try {
       setLoading(true);
@@ -85,7 +86,7 @@ const ProfilePage = () => {
       <div className="flex flex-col items-center mb-5">
         <div className="relative">
           <img
-            src={profilePic || "/default-avatar.png"}
+            src={profilePic || ''}
             alt="Profile"
             className="w-28 h-28 rounded-full object-cover border"
           />
