@@ -1,5 +1,5 @@
 import { MessageSquareText, UserSearch } from "lucide-react";
-import { PhoneCall } from "lucide-react";
+// import { PhoneCall } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { NavLink } from "react-router-dom";
 import { useAppSelector } from "@/hooks/hooks";
