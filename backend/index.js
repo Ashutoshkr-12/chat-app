@@ -31,6 +31,9 @@ connectDB().then(()=>{
     })
 })
 
+app.get("/", (req, res) => {
+  res.send("Backend is running...");
+});
 
 // API ROUTES.......
 app.use('/api/auth',userRoutes)
