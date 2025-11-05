@@ -1,3 +1,4 @@
+import assets from "@/assets/assets";
 import { useAppSelector } from "@/hooks/hooks";
 import  { useEffect, useState } from "react";
 
@@ -88,7 +89,7 @@ const ProfilePage = () => {
       <div className="flex flex-col items-center mb-5">
         <div className="relative">
           <img
-            src={profilePic || ''}
+            src={profilePic || assets.defaultUser}
             alt="Profile"
             className="w-28 h-28 rounded-full object-cover border"
           />

@@ -4,6 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { NavLink } from "react-router-dom";
 import { useAppSelector } from "@/hooks/hooks";
 import { useEffect, useState } from "react";
+import assets from "@/assets/assets";
 
 
 const Sidebar = () => {
@@ -59,7 +60,7 @@ const Sidebar = () => {
           <Avatar className="w-10 h-10">
                 <AvatarImage
                   className="object-cover"
-                  src={profilePic ?? undefined}
+                  src={profilePic || assets.defaultUser}
                 />
                 <AvatarFallback>You</AvatarFallback>
               </Avatar>
