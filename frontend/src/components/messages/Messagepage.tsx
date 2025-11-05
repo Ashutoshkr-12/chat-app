@@ -89,7 +89,7 @@ const sendMessage = () => {
 
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col  h-full">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b bg-white dark:bg-gray-800">
         <button onClick={onBack}  className="md:hidden text-gray-700 dark:text-gray-300">
@@ -108,7 +108,7 @@ const sendMessage = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-x-scroll overflow-y-scroll  no-scrollbar p-4 space-y-3">
+      <div className="flex-1 overflow-x-hidden overflow-y-scroll no-scrollbar p-4 space-y-3">
         {currentMessages?.map((msg: any, idx: number) => (
           <div
             key={idx}

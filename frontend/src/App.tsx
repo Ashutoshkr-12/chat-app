@@ -2,8 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
-import { getSocket, initSocket } from './socket/socket';
-import { messageListner, receiveRequest } from './socket/listener';
+import {  initSocket } from './socket/socket';
 import { useAppDispatch, useAppSelector } from './hooks/hooks';
 
 function App() {

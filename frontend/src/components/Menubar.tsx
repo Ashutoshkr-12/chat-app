@@ -42,12 +42,12 @@ const Sidebar = () => {
             Chats
           </button>
         </NavLink>
-        <NavLink to={"/calls"}>
+        {/* <NavLink to={"/calls"}>
           <button className="active:bg-slate-200 active:text-black flex flex-col items-center px-4 py-4 rounded-lg">
             <PhoneCall />
             Calls
           </button>
-        </NavLink>
+        </NavLink> */}
 
         <NavLink to={"/requests"}>
           <button className="active:bg-slate-200 flex flex-col items-center active:text-black px-4 py-4 rounded-lg">
