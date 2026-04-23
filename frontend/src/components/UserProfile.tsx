@@ -1,4 +1,3 @@
-import assets from "@/assets/assets";
 import { useAppSelector } from "@/hooks/hooks";
 import  { useEffect, useState } from "react";
 
@@ -44,29 +43,6 @@ const ProfilePage = () => {
     }
   };
 
-  // update user profile
-  const handleUpdate = async () => {
-    // const formData = new FormData();
-    // formData.append("username", username);
-    // formData.append("email", email);
-    // if (profilePic) formData.append("profilePic", profilePic);
-
-    // try {
-    //   setLoading(true);
-    //   const res = await fetch("/api/user/update", {
-    //     method: "PUT",
-    //     body: formData,
-    //   });
-    //   const data = await res.json();
-    //   setMessage(data.message);
-    //   getUserProfile();
-    // } catch (err) {
-    //   console.error(err);
-    //   setMessage("Something went wrong!");
-    // } finally {
-    //   setLoading(false);
-    // }
-  };
 
 
   useEffect(() => {
