@@ -31,8 +31,9 @@ io.on('connection',async (socket) => {
   const user = await User.findById(decode.id);
 
   socket.userId = user._id.toString();
-  onlineUser.set(socket.userId,socket.id);
-   //console.log("user online:", user._id);
+
+  onlineUser.set(socket.userId, socket.id);
+  // console.log("user online:", user._id);
    io.emit("user-list", Array.from(onlineUser.keys()));
 
    socket.broadcast.emit("user-online", socket.userId);

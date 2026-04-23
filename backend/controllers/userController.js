@@ -8,7 +8,7 @@ const cookieOptions = {
  httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: "strict",
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  maxAge: 400 * 24 * 60 * 60 * 1000,
 }
 
 
@@ -127,7 +127,7 @@ const loginUser = async(req,res) =>{
 
      const token = jwt.sign(
         { id: user._id, email: user.email},
-        process.env.JWT_SECRET,{expiresIn: "7d"}
+        process.env.JWT_SECRET,{expiresIn: "400d"}
      )
  
      return res.cookie('token',token,cookieOptions).status(200).json({

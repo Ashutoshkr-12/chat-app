@@ -74,12 +74,6 @@ export function LoginForm() {
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <NavLink
-                    to="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </NavLink>
                 </div>
                 <Input id="password" onChange={(e)=> setForm({...form, password: e.target.value})}  type="password" required />
               </Field>

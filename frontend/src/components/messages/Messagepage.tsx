@@ -29,11 +29,12 @@ export default function MessagePage({ selectedChat, onBack }: MessagePageProps) 
   const userId = decodedUser?.id;
   const messageState  = useAppSelector((state) => state.messages)
   //console.log('messages:',messageState)
-
+  
   const currentMessages = conversationId ? messageState[conversationId] || [] : [];
+  // console.log(currentMessages)
 
   const otherUser = selectedChat?.members?.find((m: any) => m._id !== userId);
-
+  //  console.log(otherUser)
   // socket connection
     useEffect(() => {
       if (!conversationId || !userId || !token) return;

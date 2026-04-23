@@ -80,7 +80,7 @@ useEffect(() => {
                 <div className="w-12 h-12 rounded-full ">
                   <img
                     className="rounded-full w-full h-full object-cover"
-                    src="https://img.freepik.com/free-photo/portrait-happy-smiling-woman-standing-square-sunny-summer-spring-day-outside-cute-smiling-woman-looking-you-attractive-young-girl-enjoying-summer-filtered-image-flare-sunshine_231208-6734.jpg?semt=ais_hybrid&w=740&q=80"
+                    src={user.profileImage}
                     alt="profilepic"
                   />
                 </div>

@@ -48,7 +48,7 @@ export const getMessage = async(req,res)=>{
 }
 
 
-    //     await Message.updateMany(
+    //   await Message.updateMany(
     //   { conversationId, receiver: userId, seen: false },
     //   { $set: { seen: true } }
     // );

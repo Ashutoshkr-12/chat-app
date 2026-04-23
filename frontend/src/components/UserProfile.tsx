@@ -89,7 +89,7 @@ const ProfilePage = () => {
       <div className="flex flex-col items-center mb-5">
         <div className="relative">
           <img
-            src={profilePic || assets.defaultUser}
+            src={profilePic!}
             alt="Profile"
             className="w-28 h-28 rounded-full object-cover border"
           />
@@ -106,33 +106,16 @@ const ProfilePage = () => {
       {/* username */}
       <div className="mb-4">
         <label className="block text-sm text-gray-600 mb-1">Username</label>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="w-full border p-2 rounded-md"
-        />
+         <span>{username}</span>
       </div>
 
       {/* email */}
       <div className="mb-4">
         <label className="block text-sm text-gray-600 mb-1">Email</label>
-        <input
-          type="email"
-          value={email}
-          readOnly
-          className="w-full border p-2 rounded-md  cursor-not-allowed"
-        />
+<span>{email}</span>
       </div>
 
-      {/* update button */}
-      <button
-        onClick={handleUpdate}
-        disabled={loading}
-        className="bg-green-500 text-black font-semibold w-full py-2 rounded-md hover:bg-green-600"
-      >
-       update profile
-      </button>
+    
     </div>
   );
 };

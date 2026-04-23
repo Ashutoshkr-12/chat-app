@@ -4,6 +4,7 @@ import { UserSearch } from "lucide-react";
 import { useAppSelector } from "@/hooks/hooks";
 import {jwtDecode} from "jwt-decode";
 
+
 interface ChatListProps {
   chats: any[];
   loading?: boolean;
@@ -23,7 +24,7 @@ interface JwtPayload {
 
  const token = useAppSelector((state) => state.auth.token);
  const onlineUsers = useAppSelector(state => state.online.users);
- //console.log('online user:',onlineUsers)
+//  console.log('online user:',onlineUsers)
 const decodedUser = token ? jwtDecode<JwtPayload>(token) : null;
 const user = decodedUser;
  //console.log(decodedUser);
