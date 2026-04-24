@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 8000;;
 // console.log(process.env.PORT);
 // console.log(process.env.MONGODB_URI);
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
+ "https://chat-app-five-phi-84.vercel.app"
 ];
 
 app.use(cors({
